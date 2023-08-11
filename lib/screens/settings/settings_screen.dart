@@ -12,8 +12,9 @@ import 'package:flutter_post_printer_example/libraries/app_data.dart'
     as AppData;
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage();
+  const SettingsPage({super.key});
 
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
