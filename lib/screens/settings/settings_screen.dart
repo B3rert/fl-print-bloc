@@ -223,112 +223,112 @@ class _SettingsFromState extends State<SettingsFrom> {
             children: [
               Scaffold(
                 appBar: AppBar(title: const Text("Settings")),
-                body: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      title: Text(printerDefault.name),
-                      subtitle: Text(
-                          "${printerDefault.address!} | Papel: $paperDefault"),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
+                body: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text(printerDefault.name),
+                        subtitle: Text(
+                            "${printerDefault.address!} | Papel: $paperDefault"),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                printerSelect = printerDefault;
+                                isPairedSelect = isPairedDefault;
+                                showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      SelectSizePaperFrom(
+                                    function: setPrinter,
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.edit),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                BlocProvider.of<SettingsBloc>(context)
+                                    .add(DelPrinterEvent());
+                              },
+                              icon: const Icon(Icons.delete),
+                            ),
+                          ],
+                        ),
+                        leading: Icon(Icons.bluetooth,
+                            color: AppData.statusColor[_currentStatus]),
+                      ),
+                      Column(
                         children: [
-                          IconButton(
-                            onPressed: () {
-                              printerSelect = printerDefault;
-                              isPairedSelect = isPairedDefault;
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    SelectSizePaperFrom(
-                                  function: setPrinter,
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.edit),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              BlocProvider.of<SettingsBloc>(context)
-                                  .add(DelPrinterEvent());
-                            },
-                            icon: const Icon(Icons.delete),
-                          ),
+                          ElevatedButton(
+                              onPressed: (_currentStatus == BTStatus.connected)
+                                  ? () {
+                                      _printReceiveTest();
+                                    }
+                                  : null,
+                              child: const Text("Ticket de Prueba")),
+                          ElevatedButton(
+                              onPressed: (_currentStatus == BTStatus.connected)
+                                  ? () {
+                                      BlocProvider.of<SettingsBloc>(context)
+                                          .add(PrintTicketEvent());
+                                    }
+                                  : null,
+                              child: const Text("Ticket de API(Simulacion)")),
                         ],
                       ),
-                      leading: Icon(Icons.bluetooth,
-                          color: AppData.statusColor[_currentStatus]),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                            onPressed: (_currentStatus == BTStatus.connected)
-                                ? () {
-                                    _printReceiveTest();
-                                  }
+                      const Divider(),
+                      Text("Dispositivos disponibles",
+                          style: Theme.of(context).textTheme.headline5!),
+                      const Divider(),
+                      SwitchListTile(
+                        title: const Text("Lista de dispositivos encontrados"),
+                        subtitle: Text(
+                            !isPairedSelect ? "Emparejados" : "Encontrados"),
+                        value: isPairedSelect,
+                        onChanged: (value) {
+                          setState(() {
+                            isPairedSelect = value;
+                          });
+                          scan();
+                        },
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: devices.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(devices[index].name),
+                            subtitle: Text(devices[index].address!),
+                            onTap: () {
+                              setState(() {
+                                printerSelect = devices[index];
+                              });
+                            },
+                            selected: printerSelect == devices[index],
+                            trailing: printerSelect == devices[index]
+                                ? ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (BuildContext context) =>
+                                            SelectSizePaperFrom(
+                                          function: setPrinter,
+                                        ),
+                                      );
+                                    },
+                                    child: const Text("Agregar"))
                                 : null,
-                            child: const Text("Ticket de Prueba")),
-                        const SizedBox(width: 50),
-                        ElevatedButton(
-                            onPressed: (_currentStatus == BTStatus.connected)
-                                ? () {
-                                    BlocProvider.of<SettingsBloc>(context)
-                                        .add(PrintTicketEvent());
-                                  }
-                                : null,
-                            child: const Text("Ticket de API(Simulacion)")),
-                      ],
-                    ),
-                    const Divider(),
-                    Text("Dispositivos disponibles",
-                        style: Theme.of(context).textTheme.headline5!),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text("Lista de dispositivos encontrados"),
-                      subtitle:
-                          Text(!isPairedSelect ? "Emparejados" : "Encontrados"),
-                      value: isPairedSelect,
-                      onChanged: (value) {
-                        setState(() {
-                          isPairedSelect = value;
-                        });
-                        scan();
-                      },
-                    ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: devices.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(devices[index].name),
-                          subtitle: Text(devices[index].address!),
-                          onTap: () {
-                            setState(() {
-                              printerSelect = devices[index];
-                            });
-                          },
-                          selected: printerSelect == devices[index],
-                          trailing: printerSelect == devices[index]
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      barrierDismissible: false,
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          SelectSizePaperFrom(
-                                        function: setPrinter,
-                                      ),
-                                    );
-                                  },
-                                  child: const Text("Agregar"))
-                              : null,
-                        );
-                      },
-                    )
-                  ],
+                          );
+                        },
+                      )
+                    ],
+                  ),
                 ),
               ),
               if (isLoading) const Center(child: CircularProgressIndicator())
