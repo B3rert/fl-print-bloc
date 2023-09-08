@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -12,7 +9,7 @@ import 'package:flutter_pos_printer_platform/flutter_pos_printer_platform.dart';
 import 'package:flutter_post_printer_example/bloc/print/print_bloc.dart';
 import 'package:flutter_post_printer_example/libraries/app_data.dart'
     as AppData;
-import 'package:image/image.dart' as img;
+import 'package:flutter_post_printer_example/models/print_model.dart';
 
 class PrintView extends StatefulWidget {
   const PrintView({Key? key}) : super(key: key);
@@ -123,31 +120,238 @@ class _PrintViewState extends State<PrintView> {
   }
 
   Future _printReceiveTest() async {
-    // Convierte la imagen en bytes
+    List<PrintModel> header = [
+      PrintModel(
+        content: "GRUPO FARMACEUTICO COMERCIAL DELNORTE, S.A",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "FARMACIAS DEL PUEBLO TECPAN",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content:
+            "Dirección:1 Avenida 2-00 zona 2 Tecpán Guatemala, Chimaltenango.",
+        aling: "center",
+        bold: true,
+      ),
+    ];
+
+    List<PrintModel> header2 = [
+      PrintModel(
+        content: "Nit. 76489426",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "PRUEBA TICKET",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "PRUEBA DOCUMENTO TRIBUTARIO ELECTRONICO",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "Fecha Certificacion: 29/11/2022 13:12:25",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "Serie: B569E6B7",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "Autorizacion",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "B569E6B7-E816-48DA-8D6C-90A869B0E6BC",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "No. Documento: 3893774554",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "Nombre: Nombre Cliente",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Nit: 5161516-2",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Direccion: Ciudad",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Fecha: 12/12/1212 12:12",
+        aling: "center",
+      ),
+    ];
+
+    final List<ExampleItems> listaItems = [
+      ExampleItems(
+          cantidad: 2,
+          descripcion:
+              'Voluptate eiusmod culpa consectetur minim ad minim magna voluptate eiusmod cillum mollit.',
+          montoU: 10.5),
+      ExampleItems(cantidad: 1, descripcion: 'Producto 2', montoU: 5),
+      ExampleItems(cantidad: 3, descripcion: 'Producto 3', montoU: 8),
+      ExampleItems(cantidad: 4, descripcion: 'Producto 4', montoU: 12.75),
+      ExampleItems(cantidad: 2, descripcion: 'Producto 5', montoU: 7),
+    ];
 
     List<int> bytes = [];
+
     final generator = Generator(
-        AppData.paperSize[paperDefault], await CapabilityProfile.load());
+      AppData.paperSize[paperDefault],
+      await CapabilityProfile.load(),
+    );
+
     bytes += generator.setGlobalCodeTable('CP1252');
-    bytes += generator.text("PRUEBA TICKET",
+
+    for (var content in header) {
+      bytes += generator.text(
+        content.content,
         styles: PosStyles(
-            align: AppData.posAlign["center"],
-            width: AppData.posTextSize[2],
-            height: AppData.posTextSize[2]));
-    bytes += generator.text("CENTER",
+          align: AppData.posAlign[content.aling],
+          bold: content.bold ?? false,
+        ),
+      );
+    }
+    bytes += generator.row(
+      [
+        PosColumn(
+            text: "Tel. (502) 7832-9107",
+            styles: const PosStyles(
+              bold: true,
+            ),
+            width: 6,
+            containsChinese: false),
+        PosColumn(
+          text: "E (2)",
+          styles: PosStyles(
+            bold: true,
+            align: AppData.posAlign["right"],
+          ),
+          width: 6,
+        ),
+      ],
+    );
+
+    for (var content in header2) {
+      bytes += generator.text(
+        content.content,
         styles: PosStyles(
-            align: AppData.posAlign["center"],
-            width: AppData.posTextSize[1],
-            height: AppData.posTextSize[1]));
-    bytes += generator.text("LEFT",
-        styles: PosStyles(align: AppData.posAlign["left"]));
-    bytes += generator.text("RIGHT",
-        styles: PosStyles(align: AppData.posAlign["right"]));
-    bytes += generator.text("normal",
-        styles: PosStyles(bold: AppData.boolText["normal"]));
-    bytes += generator.text("Bool",
-        styles: PosStyles(bold: AppData.boolText["bool"]));
-    // bytes += generator.barcode(Barcode.codabar([1, 2, 9, 6, 5]));
+          align: AppData.posAlign[content.aling],
+          bold: content.bold ?? false,
+        ),
+      );
+    }
+
+    bytes += generator.emptyLines(1);
+    bytes += generator.row(
+      [
+        PosColumn(text: 'Cant.', width: 2), // Ancho 2
+        PosColumn(text: 'Descripcion', width: 4), // Ancho 6
+        PosColumn(text: 'Precio U', width: 3), // Ancho 4
+        PosColumn(text: 'Monto', width: 3), // Ancho 4
+      ],
+    );
+
+    for (var transaction in listaItems) {
+      bytes += generator.row(
+        [
+          PosColumn(text: "${transaction.cantidad}", width: 2), // Ancho 2
+          PosColumn(text: transaction.descripcion, width: 4), // Ancho 6
+          PosColumn(
+            text: transaction.montoU.toStringAsPrecision(2),
+            width: 3,
+            styles: PosStyles(
+              align: AppData.posAlign["right"],
+            ),
+          ), // Ancho 4
+          PosColumn(
+            text: (transaction.cantidad * transaction.montoU)
+                .toStringAsPrecision(2),
+            width: 3,
+            styles: PosStyles(
+              align: AppData.posAlign["right"],
+            ),
+          ), // Ancho 4
+        ],
+      );
+    }
+
+    bytes += generator.row(
+      [
+        PosColumn(text: "Sub-Total", width: 6, containsChinese: false),
+        PosColumn(
+          text: "00.00",
+          styles: PosStyles(
+            align: AppData.posAlign["right"],
+          ),
+          width: 6,
+        ),
+      ],
+    );
+
+    bytes += generator.row(
+      [
+        PosColumn(text: "Cargos", width: 6, containsChinese: false),
+        PosColumn(
+          text: "00.00",
+          styles: PosStyles(
+            align: AppData.posAlign["right"],
+          ),
+          width: 6,
+        ),
+      ],
+    );
+
+    bytes += generator.row(
+      [
+        PosColumn(text: "Descuentos", width: 6, containsChinese: false),
+        PosColumn(
+          text: "00.00",
+          styles: PosStyles(
+            align: AppData.posAlign["right"],
+          ),
+          width: 6,
+        ),
+      ],
+    );
+
+    bytes += generator.row(
+      [
+        PosColumn(
+            text: "TOTAL",
+            styles: const PosStyles(
+              bold: true,
+            ),
+            width: 6,
+            containsChinese: false),
+        PosColumn(
+          text: "00.00",
+          styles: PosStyles(
+            bold: true,
+            align: AppData.posAlign["right"],
+          ),
+          width: 6,
+        ),
+      ],
+    );
+
+    bytes += generator.emptyLines(1);
 
     _printerEscPos(bytes, generator);
   }
