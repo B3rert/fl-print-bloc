@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -9,6 +12,7 @@ import 'package:flutter_pos_printer_platform/flutter_pos_printer_platform.dart';
 import 'package:flutter_post_printer_example/bloc/print/print_bloc.dart';
 import 'package:flutter_post_printer_example/libraries/app_data.dart'
     as AppData;
+import 'package:image/image.dart' as img;
 
 class PrintView extends StatefulWidget {
   const PrintView({Key? key}) : super(key: key);
@@ -111,6 +115,7 @@ class _PrintViewState extends State<PrintView> {
     if (Platform.isAndroid) pendingTask = bytes;
     if (Platform.isAndroid) {
       await instanceManager.send(type: PrinterType.bluetooth, bytes: bytes);
+
       pendingTask = null;
     } else {
       await instanceManager.send(type: PrinterType.bluetooth, bytes: bytes);
@@ -118,6 +123,9 @@ class _PrintViewState extends State<PrintView> {
   }
 
   Future _printReceiveTest() async {
+    // Convierte la imagen en bytes
+    final Uint8List imageBytes = await imageToBytes("assets/logo_demosoft.png");
+
     List<int> bytes = [];
     final generator = Generator(
         AppData.paperSize[paperDefault], await CapabilityProfile.load());
@@ -140,8 +148,19 @@ class _PrintViewState extends State<PrintView> {
         styles: PosStyles(bold: AppData.boolText["normal"]));
     bytes += generator.text("Bool",
         styles: PosStyles(bold: AppData.boolText["bool"]));
+    // bytes += generator.barcode(Barcode.codabar([1, 2, 9, 6, 5]));
 
     _printerEscPos(bytes, generator);
+  }
+
+  Future<Uint8List> imageToBytes(String assetPath) async {
+    // Carga la imagen desde los assets
+    final ByteData data = await rootBundle.load(assetPath);
+
+    // Convierte ByteData en una lista de bytes (Uint8List)
+    final Uint8List bytes = data.buffer.asUint8List();
+
+    return bytes;
   }
 
   Future _printTicketSimulacion(dynamic dataTicket) async {
