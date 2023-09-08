@@ -1,18 +1,21 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter_post_printer_example/screens/settings/settings.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_post_printer_example/services/requests/request_ticket.dart';
 import 'package:flutter_post_printer_example/services/storages/storage_printer.dart';
 
-class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  @override
-  SettingsBloc() : super(SettingsInitialState());
+part 'print_event.dart';
+part 'print_state.dart';
 
-  SettingsState get initialState => SettingsInitialState();
+class PrintBloc extends Bloc<PrintEvent, PrintState> {
+  @override
+  PrintBloc() : super(SettingsInitialState());
+
+  PrintState get initialState => SettingsInitialState();
 
   @override
-  Stream<SettingsState> mapEventToState(SettingsEvent event) async* {
+  Stream<PrintState> mapEventToState(PrintEvent event) async* {
     final sp = StoragePrinter();
-    final rt=RequestTicket();
+    final rt = RequestTicket();
     try {
       if (event is GetPrinterEvent) {
         yield SettingsPrinterLoadingState();
@@ -36,7 +39,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       if (event is SetPrinterEvent) {
         yield SettingsPrinterLoadingState();
         sp.setPrinter(
-            name: event.name, address: event.address, paired: event.paired, paper: event.paper);
+            name: event.name,
+            address: event.address,
+            paired: event.paired,
+            paper: event.paper);
         yield SettingsPrinterReceivedState(
             name: await sp.getName(),
             address: await sp.getAddress(),
@@ -45,7 +51,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         yield SettingsPrinterSuccessState();
       }
 
-      if(event is PrintTicketEvent){
+      if (event is PrintTicketEvent) {
         yield SettingsPrinterLoadingState();
         yield SettingsTicketReceivedState(ticket: await rt.getDataTicket());
         yield SettingsPrinterSuccessState();

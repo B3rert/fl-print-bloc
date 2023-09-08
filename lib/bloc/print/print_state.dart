@@ -1,18 +1,17 @@
-import 'package:equatable/equatable.dart';
-import 'package:flutter_post_printer_example/screens/settings/settings.dart';
+part of 'print_bloc.dart';
 
-abstract class SettingsState extends Equatable {
-  const SettingsState();
+abstract class PrintState extends Equatable {
+  const PrintState();
 
   @override
   List<Object> get props => [];
 }
 
-class SettingsInitialState extends SettingsState {}
+class SettingsInitialState extends PrintState {}
 
-class SettingsPrinterLoadingState extends SettingsState {}
+class SettingsPrinterLoadingState extends PrintState {}
 
-class SettingsPrinterReceivedState extends SettingsState {
+class SettingsPrinterReceivedState extends PrintState {
   String name;
   String address;
   bool paired;
@@ -33,9 +32,9 @@ class SettingsPrinterReceivedState extends SettingsState {
       "SettingsPrinterReceivedState{ name: $name,address:$address,paired:$paired,paper:$paper}";
 }
 
-class SettingsPrinterSuccessState extends SettingsState {}
+class SettingsPrinterSuccessState extends PrintState {}
 
-class SettingsTicketReceivedState extends SettingsState {
+class SettingsTicketReceivedState extends PrintState {
   dynamic ticket;
   SettingsTicketReceivedState({required this.ticket});
   @override
@@ -44,7 +43,7 @@ class SettingsTicketReceivedState extends SettingsState {
   String toString() => "SettingsTicketReceivedState{ ticket: $ticket}";
 }
 
-class SettingsFailureState extends SettingsState {
+class SettingsFailureState extends PrintState {
   final String error;
 
   const SettingsFailureState({required this.error});

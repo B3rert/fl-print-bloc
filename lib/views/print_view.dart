@@ -1,38 +1,23 @@
+import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:flutter_pos_printer_platform/flutter_pos_printer_platform.dart';
-import 'package:flutter_post_printer_example/bloc/settings_bloc.dart';
-import 'package:flutter_post_printer_example/screens/settings/settings.dart';
+import 'package:flutter_post_printer_example/bloc/print/print_bloc.dart';
 import 'package:flutter_post_printer_example/libraries/app_data.dart'
     as AppData;
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class PrintView extends StatefulWidget {
+  const PrintView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        return SettingsBloc()..add(GetPrinterEvent());
-      },
-      child: const SettingsFrom(),
-    );
-  }
+  State<PrintView> createState() => _PrintViewState();
 }
 
-class SettingsFrom extends StatefulWidget {
-  const SettingsFrom({Key? key}) : super(key: key);
-
-  @override
-  State<SettingsFrom> createState() => _SettingsFromState();
-}
-
-class _SettingsFromState extends State<SettingsFrom> {
+class _PrintViewState extends State<PrintView> {
   final PrinterManager instanceManager = PrinterManager.instance;
   List<PrinterDevice> devices = [];
   PrinterDevice printerDefault = PrinterDevice(name: '', address: '');
@@ -178,7 +163,7 @@ class _SettingsFromState extends State<SettingsFrom> {
   }
 
   void setPrinter(int paper) {
-    BlocProvider.of<SettingsBloc>(context).add(SetPrinterEvent(
+    BlocProvider.of<PrintBloc>(context).add(SetPrinterEvent(
         name: printerSelect.name,
         address: printerSelect.address!,
         paired: isPairedSelect,
@@ -187,7 +172,7 @@ class _SettingsFromState extends State<SettingsFrom> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SettingsBloc, SettingsState>(
+    return BlocListener<PrintBloc, PrintState>(
       listener: (context, state) {
         if (state is SettingsInitialState) {}
         if (state is SettingsPrinterLoadingState) {
@@ -217,7 +202,7 @@ class _SettingsFromState extends State<SettingsFrom> {
           _printTicketSimulacion(state.ticket);
         }
       },
-      child: BlocBuilder<SettingsBloc, SettingsState>(
+      child: BlocBuilder<PrintBloc, PrintState>(
         builder: (context, state) {
           return Stack(
             children: [
@@ -252,7 +237,7 @@ class _SettingsFromState extends State<SettingsFrom> {
                             ),
                             IconButton(
                               onPressed: () {
-                                BlocProvider.of<SettingsBloc>(context)
+                                BlocProvider.of<PrintBloc>(context)
                                     .add(DelPrinterEvent());
                               },
                               icon: const Icon(Icons.delete),
@@ -274,7 +259,7 @@ class _SettingsFromState extends State<SettingsFrom> {
                           ElevatedButton(
                               onPressed: (_currentStatus == BTStatus.connected)
                                   ? () {
-                                      BlocProvider.of<SettingsBloc>(context)
+                                      BlocProvider.of<PrintBloc>(context)
                                           .add(PrintTicketEvent());
                                     }
                                   : null,

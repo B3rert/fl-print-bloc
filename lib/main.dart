@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_post_printer_example/screens/settings/settings_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_post_printer_example/bloc/print/print_bloc.dart';
+import 'package:flutter_post_printer_example/views/print_view.dart';
 
 void main() {
   runApp(const MaterialApp(home: MyApp()));
@@ -10,9 +12,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SettingsPage(),
+    return BlocProvider(
+      create: (context) {
+        return PrintBloc()..add(GetPrinterEvent());
+      },
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: PrintView(),
+      ),
     );
   }
 }
