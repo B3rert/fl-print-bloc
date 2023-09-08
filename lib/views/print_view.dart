@@ -210,6 +210,91 @@ class _PrintViewState extends State<PrintView> {
       ExampleItems(cantidad: 2, descripcion: 'Producto 5', montoU: 7),
     ];
 
+    final List<PrintModel> footer = [
+      PrintModel(
+        content: "VEINTICINCO QUETZALES CON (50/100)",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "DATOS DEL CERTIFICADOR",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Nit: 5161516-2",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Nombre: Nombre Cliente",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Vendedor: Nombre Vendedor",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Observacion:",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content:
+            "LExercitation adipisicing quis officia non proident exercitation anim quis veniam.",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "**Sujeto a pagos trimestrales**",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "*NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES*",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "-------------------------",
+        aling: "center",
+        bold: true,
+      ),
+      PrintModel(
+        content: "Powered by",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "Desarrollo Moderno de Software S.A.",
+        aling: "center",
+      ),
+      PrintModel(
+        content: "www.demosoftonline.com",
+        aling: "center",
+      ),
+    ];
+
     List<int> bytes = [];
 
     final generator = Generator(
@@ -350,6 +435,16 @@ class _PrintViewState extends State<PrintView> {
         ),
       ],
     );
+
+    for (var content in footer) {
+      bytes += generator.text(
+        content.content,
+        styles: PosStyles(
+          align: AppData.posAlign[content.aling],
+          bold: content.bold ?? false,
+        ),
+      );
+    }
 
     bytes += generator.emptyLines(1);
 
