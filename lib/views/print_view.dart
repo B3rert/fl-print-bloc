@@ -573,30 +573,15 @@ class _PrintViewState extends State<PrintView> {
     _printerEscPos(bytes, generator);
   }
 
-  Future _printTicketSimulacion(dynamic dataTicket) async {
-    List<int> bytes = [];
-    final generator = Generator(
-        AppData.paperSize[paperDefault], await CapabilityProfile.load());
-    bytes += generator.setGlobalCodeTable('CP1252');
-    List<dynamic> listRow = json.decode(json.encode(dataTicket));
-    for (var row in listRow) {
-      bytes += generator.text(row["content"],
-          styles: PosStyles(
-              align: AppData.posAlign[row["align"]],
-              bold: AppData.boolText[row["style"]],
-              width: AppData.posTextSize[row["size"]],
-              height: AppData.posTextSize[row["size"]],
-              fontType: AppData.posTextSize[row["font"]]));
-    }
-    _printerEscPos(bytes, generator);
-  }
-
   void setPrinter(int paper) {
-    BlocProvider.of<PrintBloc>(context).add(SetPrinterEvent(
+    BlocProvider.of<PrintBloc>(context).add(
+      SetPrinterEvent(
         name: printerSelect.name,
         address: printerSelect.address!,
         paired: isPairedSelect,
-        paper: paper));
+        paper: paper,
+      ),
+    );
   }
 
   @override
@@ -625,10 +610,6 @@ class _PrintViewState extends State<PrintView> {
           setState(() {
             isLoading = false;
           });
-        }
-
-        if (state is SettingsTicketReceivedState) {
-          _printTicketSimulacion(state.ticket);
         }
       },
       child: BlocBuilder<PrintBloc, PrintState>(
@@ -679,20 +660,13 @@ class _PrintViewState extends State<PrintView> {
                       Column(
                         children: [
                           ElevatedButton(
-                              onPressed: (_currentStatus == BTStatus.connected)
-                                  ? () {
-                                      _printReceiveTest();
-                                    }
-                                  : null,
-                              child: const Text("Ticket de Prueba")),
-                          ElevatedButton(
-                              onPressed: (_currentStatus == BTStatus.connected)
-                                  ? () {
-                                      BlocProvider.of<PrintBloc>(context)
-                                          .add(PrintTicketEvent());
-                                    }
-                                  : null,
-                              child: const Text("Ticket de API(Simulacion)")),
+                            onPressed: (_currentStatus == BTStatus.connected)
+                                ? () {
+                                    _printReceiveTest();
+                                  }
+                                : null,
+                            child: const Text("Ticket de Prueba"),
+                          ),
                         ],
                       ),
                       const Divider(),
