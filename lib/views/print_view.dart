@@ -9,6 +9,7 @@ import 'package:flutter_pos_printer_platform/flutter_pos_printer_platform.dart';
 import 'package:flutter_post_printer_example/bloc/print/print_bloc.dart';
 import 'package:flutter_post_printer_example/libraries/app_data.dart'
     as AppData;
+import 'package:flutter_post_printer_example/models/doc_print_model.dart';
 import 'package:flutter_post_printer_example/models/print_model.dart';
 
 class PrintView extends StatefulWidget {
@@ -120,180 +121,99 @@ class _PrintViewState extends State<PrintView> {
   }
 
   Future _printReceiveTest() async {
-    List<PrintModel> header = [
-      PrintModel(
-        content: "GRUPO FARMACEUTICO COMERCIAL DELNORTE, S.A",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "FARMACIAS DEL PUEBLO TECPAN",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content:
-            "Dirección:1 Avenida 2-00 zona 2 Tecpán Guatemala, Chimaltenango.",
-        aling: "center",
-        bold: true,
-      ),
-    ];
+    // Datos en formato JSON
+    const jsonString = '''
+ {
+    "empresa": {
+        "razonSocial":"GRUPO FARMACEUTICO COMERCIAL DEL NORTE, S.A.",
+        "nombre": " FARMACIAS DEL PUEBLO TECPAN",
+        "direccion": "Dirección:1 Avenida 2-00 zona 2 Tecpán Guatemala, Chimaltenango.",
+        "nit": "12345678-9",
+        "tel": "(502) 12345678"
+    },
+    "documento": {
+        "titulo": "Prueba",
+        "descripcion":"FEL DOCUMENTO TRIBUTARIO ELECTRONICO",
+        "fechaCert": "29/11/2022 13:12:25",
+        "serie": "FEFE545",
+        "no": 151581,
+        "autorizacion": "41D8A5CD-F366-4759-BDAD-29C1C99B1DFC",
+        "noInterno": "FEL-254"
+    },
+    "cliente": {
+        "nombre": "CONSUMIDOR FINAL",
+        "direccion": "CIUDAD",
+        "nit": "C/F",
+        "fecha": "29/11/2022 13:12:25"
+    },
+    "items": [
+        {
+            "descripcion": "<DESCRIPCION ITEM>",
+            "cantidad": 10,
+            "precioUnitario": 2.80
+        },
+        {
+            "descripcion": "<DESCRIPCION ITEM>",
+            "cantidad": 10,
+            "precioUnitario": 10.00
+        },
+        {
+            "descripcion": "<DESCRIPCION ITEM>",
+            "cantidad": 10,
+            "precioUnitario": 250.00
+        },
+        {
+            "descripcion": "<DESCRIPCION ITEM>",
+            "cantidad": 10,
+            "precioUnitario": 250.75
+        },
+        {
+            "descripcion": "<DESCRIPCION ITEM>",
+            "cantidad": 10,
+            "precioUnitario": 0.00
+        },
+        {
+            "descripcion": "<DESCRIPCION ITEM>",
+            "cantidad": 10,
+            "precioUnitario": 0.00
+        }
+    ],
+    "montos": {
+        "subtotal": 0.00,
+        "cargos": 0.00,
+        "descuentos": 0.00,
+        "total": 0.00,
+        "totalLetras": "VEINTICINCO QUETZALES CON CINCUENTA CENTAVOS"
+    },
+    "pagos":[
+        {
+            "tipoPago":"Efectivo",
+            "contado":  0.00,
+            "cambio":0.00
+        }
+    ],
+    "vendedor":"<NOMBRE VENDEDOR>",
+    "certificador":{
+        "nombre": ": INFILE, S.A.",
+        "nit": "12345678-9"
+    },
+    "observacion":"Aute do enim mollit ea pariatur amet consequat id cupidatat et.",
+    "mensajes":[
+        "**Sujeto a pagos trimestrales**",
+        "*NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES*"
+    ],
+    "poweredBy":{
+        "nombre":"Desarrollo Moderno de Software S.A.",
+        "website":"www.demosoftonline.com"
+    }
+}
+  ''';
 
-    List<PrintModel> header2 = [
-      PrintModel(
-        content: "Nit. 76489426",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "PRUEBA TICKET",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "PRUEBA DOCUMENTO TRIBUTARIO ELECTRONICO",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "Fecha Certificacion: 29/11/2022 13:12:25",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "Serie: B569E6B7",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "Autorizacion",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "B569E6B7-E816-48DA-8D6C-90A869B0E6BC",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "No. Documento: 3893774554",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "Nombre: Nombre Cliente",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Nit: 5161516-2",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Direccion: Ciudad",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Fecha: 12/12/1212 12:12",
-        aling: "center",
-      ),
-    ];
+    // Decodifica el JSON
+    final Map<String, dynamic> jsonData = json.decode(jsonString);
 
-    final List<ExampleItems> listaItems = [
-      ExampleItems(
-          cantidad: 2,
-          descripcion:
-              'Voluptate eiusmod culpa consectetur minim ad minim magna voluptate eiusmod cillum mollit.',
-          montoU: 10.5),
-      ExampleItems(cantidad: 1, descripcion: 'Producto 2', montoU: 5),
-      ExampleItems(cantidad: 3, descripcion: 'Producto 3', montoU: 8),
-      ExampleItems(cantidad: 4, descripcion: 'Producto 4', montoU: 12.75),
-      ExampleItems(cantidad: 2, descripcion: 'Producto 5', montoU: 7),
-    ];
-
-    final List<PrintModel> footer = [
-      PrintModel(
-        content: "VEINTICINCO QUETZALES CON (50/100)",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "DATOS DEL CERTIFICADOR",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Nit: 5161516-2",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Nombre: Nombre Cliente",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Vendedor: Nombre Vendedor",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Observacion:",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content:
-            "LExercitation adipisicing quis officia non proident exercitation anim quis veniam.",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "**Sujeto a pagos trimestrales**",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "*NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES*",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "-------------------------",
-        aling: "center",
-        bold: true,
-      ),
-      PrintModel(
-        content: "Powered by",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "Desarrollo Moderno de Software S.A.",
-        aling: "center",
-      ),
-      PrintModel(
-        content: "www.demosoftonline.com",
-        aling: "center",
-      ),
-    ];
+    // Crea un objeto DocPrintModel
+    final docPrintModel = DocPrintModel.fromMap(jsonData);
 
     List<int> bytes = [];
 
@@ -302,75 +222,179 @@ class _PrintViewState extends State<PrintView> {
       await CapabilityProfile.load(),
     );
 
+    PosStyles center = const PosStyles(
+      align: PosAlign.center,
+    );
+    PosStyles centerBold = const PosStyles(
+      align: PosAlign.center,
+      bold: true,
+    );
+
     bytes += generator.setGlobalCodeTable('CP1252');
 
-    for (var content in header) {
-      bytes += generator.text(
-        content.content,
-        styles: PosStyles(
-          align: AppData.posAlign[content.aling],
-          bold: content.bold ?? false,
-        ),
-      );
-    }
+    bytes += generator.text(
+      docPrintModel.empresa.razonSocial,
+      styles: center,
+    );
+    bytes += generator.text(
+      docPrintModel.empresa.nombre,
+      styles: center,
+    );
+
+    bytes += generator.text(
+      docPrintModel.empresa.direccion,
+      styles: center,
+    );
+
+    bytes += generator.text(
+      "NIT: ${docPrintModel.empresa.nit}",
+      styles: center,
+    );
+
+    bytes += generator.text(
+      "Tel: ${docPrintModel.empresa.tel}",
+      styles: center,
+    );
+
+    bytes += generator.emptyLines(1);
+
+    bytes += generator.text(
+      docPrintModel.documento.titulo,
+      styles: centerBold,
+    );
+
+    bytes += generator.text(
+      docPrintModel.documento.descripcion,
+      styles: centerBold,
+    );
+
+    bytes += generator.text(
+        "Fecha certificacion: ${docPrintModel.documento.fechaCert}",
+        styles: center);
+
     bytes += generator.row(
       [
         PosColumn(
-            text: "Tel. (502) 7832-9107",
-            styles: const PosStyles(
-              bold: true,
-            ),
-            width: 6,
-            containsChinese: false),
+          text: "Factura No.",
+          width: 6,
+          styles: const PosStyles(
+            align: PosAlign.center,
+          ),
+        ),
         PosColumn(
-          text: "E (2)",
-          styles: PosStyles(
-            bold: true,
-            align: AppData.posAlign["right"],
+          text: "Serie:",
+          width: 6,
+          styles: const PosStyles(
+            align: PosAlign.center,
+          ),
+        ),
+      ],
+    );
+
+    bytes += generator.row(
+      [
+        PosColumn(
+          text: "${docPrintModel.documento.no}",
+          styles: const PosStyles(
+            height: PosTextSize.size2,
+            width: PosTextSize.size1,
+            align: PosAlign.center,
+          ),
+          width: 6,
+        ),
+        PosColumn(
+          text: docPrintModel.documento.serie,
+          styles: const PosStyles(
+            height: PosTextSize.size2,
+            width: PosTextSize.size1,
+            align: PosAlign.center,
           ),
           width: 6,
         ),
       ],
     );
 
-    for (var content in header2) {
-      bytes += generator.text(
-        content.content,
-        styles: PosStyles(
-          align: AppData.posAlign[content.aling],
-          bold: content.bold ?? false,
-        ),
-      );
-    }
+    bytes += generator.text(
+      "Autorizacion:",
+      styles: centerBold,
+    );
+
+    bytes += generator.text(
+      docPrintModel.documento.autorizacion,
+      styles: centerBold,
+    );
 
     bytes += generator.emptyLines(1);
+    bytes += generator.text(
+      "No. Interno: ${docPrintModel.documento.noInterno}",
+      styles: center,
+    );
+    bytes += generator.emptyLines(1);
+    bytes += generator.text(
+      "Cliente:",
+      styles: center,
+    );
+
+    bytes += generator.text(
+      "Nombre: ${docPrintModel.cliente.nombre}",
+      styles: center,
+    );
+    bytes += generator.text(
+      "NIT: ${docPrintModel.cliente.nit}",
+      styles: center,
+    );
+    bytes += generator.text(
+      "Direccion: ${docPrintModel.cliente.direccion}",
+      styles: center,
+    );
+
+    bytes += generator.emptyLines(1);
+
     bytes += generator.row(
       [
         PosColumn(text: 'Cant.', width: 2), // Ancho 2
         PosColumn(text: 'Descripcion', width: 4), // Ancho 6
-        PosColumn(text: 'Precio U', width: 3), // Ancho 4
-        PosColumn(text: 'Monto', width: 3), // Ancho 4
+        PosColumn(
+          text: 'Precio U',
+          width: 3,
+          styles: const PosStyles(
+            align: PosAlign.right,
+          ),
+        ), // Ancho 4
+        PosColumn(
+          text: 'Monto',
+          width: 3,
+          styles: const PosStyles(
+            align: PosAlign.right,
+          ),
+        ), // Ancho 4
       ],
     );
 
-    for (var transaction in listaItems) {
+    for (var transaction in docPrintModel.items) {
       bytes += generator.row(
         [
-          PosColumn(text: "${transaction.cantidad}", width: 2), // Ancho 2
-          PosColumn(text: transaction.descripcion, width: 4), // Ancho 6
           PosColumn(
-            text: transaction.montoU.toStringAsPrecision(2),
+            text: "${transaction.cantidad}",
+            width: 2,
+          ), // Ancho 2
+          PosColumn(
+            text: transaction.descripcion,
+            width: 4,
+          ), // Ancho 6
+          PosColumn(
+            text: transaction.precioUnitario.toStringAsPrecision(2),
             width: 3,
-            styles: PosStyles(
-              align: AppData.posAlign["right"],
+            styles: const PosStyles(
+              align: PosAlign.right,
             ),
           ), // Ancho 4
           PosColumn(
-            text: (transaction.cantidad * transaction.montoU)
+            text: (transaction.cantidad * transaction.precioUnitario)
                 .toStringAsPrecision(2),
             width: 3,
-            styles: PosStyles(
-              align: AppData.posAlign["right"],
+            styles: const PosStyles(
+              align: PosAlign.right,
             ),
           ), // Ancho 4
         ],
@@ -381,9 +405,9 @@ class _PrintViewState extends State<PrintView> {
       [
         PosColumn(text: "Sub-Total", width: 6, containsChinese: false),
         PosColumn(
-          text: "00.00",
-          styles: PosStyles(
-            align: AppData.posAlign["right"],
+          text: docPrintModel.montos.subtotal.toStringAsPrecision(2),
+          styles: const PosStyles(
+            align: PosAlign.right,
           ),
           width: 6,
         ),
@@ -394,9 +418,9 @@ class _PrintViewState extends State<PrintView> {
       [
         PosColumn(text: "Cargos", width: 6, containsChinese: false),
         PosColumn(
-          text: "00.00",
-          styles: PosStyles(
-            align: AppData.posAlign["right"],
+          text: docPrintModel.montos.cargos.toStringAsPrecision(2),
+          styles: const PosStyles(
+            align: PosAlign.right,
           ),
           width: 6,
         ),
@@ -407,14 +431,16 @@ class _PrintViewState extends State<PrintView> {
       [
         PosColumn(text: "Descuentos", width: 6, containsChinese: false),
         PosColumn(
-          text: "00.00",
-          styles: PosStyles(
-            align: AppData.posAlign["right"],
+          text: docPrintModel.montos.descuentos.toStringAsPrecision(2),
+          styles: const PosStyles(
+            align: PosAlign.right,
           ),
           width: 6,
         ),
       ],
     );
+
+    bytes += generator.emptyLines(1);
 
     bytes += generator.row(
       [
@@ -422,31 +448,128 @@ class _PrintViewState extends State<PrintView> {
             text: "TOTAL",
             styles: const PosStyles(
               bold: true,
+              width: PosTextSize.size2,
             ),
             width: 6,
             containsChinese: false),
         PosColumn(
           text: "00.00",
-          styles: PosStyles(
+          styles: const PosStyles(
             bold: true,
-            align: AppData.posAlign["right"],
+            align: PosAlign.right,
+            width: PosTextSize.size2,
           ),
           width: 6,
         ),
       ],
     );
 
-    for (var content in footer) {
-      bytes += generator.text(
-        content.content,
-        styles: PosStyles(
-          align: AppData.posAlign[content.aling],
-          bold: content.bold ?? false,
-        ),
+    bytes += generator.text(
+      docPrintModel.montos.totalLetras,
+      styles: centerBold,
+    );
+
+    bytes += generator.emptyLines(1);
+
+    bytes += generator.text(
+      "Detalle Pago:",
+      styles: center,
+    );
+
+    for (var pago in docPrintModel.pagos) {
+      bytes += generator.row(
+        [
+          PosColumn(
+            text: "Pago: ",
+            width: 6,
+          ),
+          PosColumn(
+            text: pago.tipoPago,
+            styles: const PosStyles(
+              align: PosAlign.right,
+            ),
+            width: 6,
+          ),
+        ],
+      );
+      bytes += generator.row(
+        [
+          PosColumn(
+            text: "Contado:",
+            width: 6,
+          ),
+          PosColumn(
+            text: pago.contado.toStringAsPrecision(2),
+            styles: const PosStyles(
+              align: PosAlign.right,
+            ),
+            width: 6,
+          ),
+        ],
+      );
+      bytes += generator.row(
+        [
+          PosColumn(
+            text: "Cambio: ",
+            width: 6,
+          ),
+          PosColumn(
+            text: pago.cambio.toStringAsPrecision(2),
+            styles: const PosStyles(
+              align: PosAlign.right,
+            ),
+            width: 6,
+          ),
+        ],
       );
     }
 
     bytes += generator.emptyLines(1);
+
+    bytes += generator.text(
+      "Vendedor: ${docPrintModel.vendedor}",
+      styles: center,
+    );
+
+    bytes += generator.emptyLines(1);
+
+    bytes += generator.text(
+      "Ceritificador: ${docPrintModel.certificador.nombre}",
+      styles: center,
+    );
+
+    bytes += generator.text(
+      "Nit: ${docPrintModel.certificador.nit}",
+      styles: center,
+    );
+    bytes += generator.emptyLines(1);
+
+    for (var mensaje in docPrintModel.mensajes) {
+      bytes += generator.text(
+        mensaje,
+        styles: centerBold,
+      );
+    }
+
+    bytes += generator.emptyLines(1);
+
+    bytes += generator.text(
+      "--------------------",
+      styles: center,
+    );
+
+    bytes += generator.text(
+      "Powered by",
+      styles: center,
+    );
+    bytes += generator.text(
+      docPrintModel.poweredBy.nombre,
+      styles: center,
+    );
+    bytes += generator.text(
+      docPrintModel.poweredBy.website,
+      styles: center,
+    );
 
     _printerEscPos(bytes, generator);
   }
