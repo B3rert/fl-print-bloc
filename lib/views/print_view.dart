@@ -10,7 +10,6 @@ import 'package:flutter_post_printer_example/bloc/print/print_bloc.dart';
 import 'package:flutter_post_printer_example/libraries/app_data.dart'
     as AppData;
 import 'package:flutter_post_printer_example/models/doc_print_model.dart';
-import 'package:flutter_post_printer_example/models/print_model.dart';
 
 class PrintView extends StatefulWidget {
   const PrintView({Key? key}) : super(key: key);
